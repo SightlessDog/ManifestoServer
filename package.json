@@ -1,5 +1,10 @@
 {
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
+    "ableton-js": "^2.1.1",
+    "fabric": "^4.5.0",
     "kafkajs": "^1.15.0"
   }
 }

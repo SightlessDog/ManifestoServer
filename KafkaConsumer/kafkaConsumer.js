@@ -12,7 +12,6 @@ const consume = async () => {
   await consumer.subscribe({ topic });
   await consumer.run({
     eachMessage: ({ message }) => {
-      console.log(message);
       console.log(`received message: ${message.value}`);
     },
   });
