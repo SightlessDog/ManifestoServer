@@ -3,9 +3,6 @@ const { Ableton } = require("ableton-js");
 const ableton = new Ableton();
 let tracks = [];
 
-ableton.on("connect", (e) => console.log("Connect", e));
-ableton.on("message", (m) => console.log("Message:", m));
-
 const loadTracks = async () => {
   tracks = await ableton.song.get("tracks");
 };
@@ -13,7 +10,10 @@ const loadTracks = async () => {
 const play = async (id) => {
   let trackToPlay = tracks[id];
   try {
-    trackToPlay.set("mute", false);
+    const isTrackMuted = await trackToPlay.get("mute");
+    if (isTrackMuted) {
+      const playing = await trackToPlay.set("mute", false);
+    }
   } catch (err) {
     console.error(err);
   }
@@ -22,7 +22,11 @@ const play = async (id) => {
 const mute = async (id) => {
   let trackToMute = tracks[id];
   try {
-    trackToMute.set("mute", true);
+    const isTrackMuted = await trackToMute.get("mute");
+    if (!isTrackMuted) {
+      const mute = await trackToMute.set("mute", true);
+      return true;
+    }
   } catch (err) {
     console.error(err);
   }
