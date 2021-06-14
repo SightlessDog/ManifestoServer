@@ -25,7 +25,6 @@ app.listen(8080, () => {
 });
 
 app.get("/", function (req, res) {
-  console.log("Inside Home");
   res.writeHead(200, {
     "Content-Type": "application/json",
   });
@@ -33,9 +32,6 @@ app.get("/", function (req, res) {
 
 app.post("/", function (req, res) {
   aoi = req.body.aoi;
-
-  console.log(aoi);
-
   loadTracks()
     .then(
       consume(aoi).catch((err) => {

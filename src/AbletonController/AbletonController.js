@@ -4,7 +4,9 @@ const ableton = new Ableton();
 let tracks = [];
 
 const loadTracks = async () => {
-  tracks = await ableton.song.get("tracks");
+  tracks = await ableton.song.get("tracks").catch((e) => {
+    console.log("error loading tracks");
+  });
 };
 
 const play = async (id) => {
