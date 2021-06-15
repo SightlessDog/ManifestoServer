@@ -7,6 +7,8 @@ const kafka = new Kafka({ brokers });
 const consumer = kafka.consumer({ groupId: "firstPart" });
 
 let users = [];
+let total = 0;
+let newTotal = 0;
 let found = false;
 
 const distanceBetweenCoords = (centerX, centerY, x, y) => {
@@ -14,10 +16,12 @@ const distanceBetweenCoords = (centerX, centerY, x, y) => {
 };
 
 const consume = async (aoi, topic) => {
+  total = newTotal;
   await consumer.connect();
   await consumer.subscribe({ topic });
   await consumer.run({
     eachMessage: async ({ message }) => {
+      newTotal++;
       found = false;
       console.log(`received message: ${message.value}`);
       let string = message.value.toString("utf-8");
@@ -53,6 +57,9 @@ const consume = async (aoi, topic) => {
       }
     },
   });
+  if (total == newTotal) {
+    await playAllTracks();
+  }
 };
 
 process.on("message", (message) => {

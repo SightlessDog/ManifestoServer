@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: false }));
 
 let aoi = {};
 
-//start your server on port 3001
+//start your server on port 8080
 app.listen(8080, () => {
   console.log("Server Listening on port 8080");
 });
@@ -32,6 +32,9 @@ app.get("/", function (req, res) {
 
 app.post("/", function (req, res) {
   aoi = req.body.aoi;
+
+  console.log(aoi);
+
   loadTracks()
     .then(
       consume(aoi).catch((err) => {
