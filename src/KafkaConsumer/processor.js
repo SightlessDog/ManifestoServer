@@ -1,33 +1,27 @@
 const { Kafka } = require("kafkajs");
-const {
-  play,
-  mute,
-  playAllTracks,
-} = require("../AbletonController/AbletonController");
-// const { fork } = require("child_process");
+const { play, mute } = require("../AbletonController/AbletonController");
 
 const brokers = ["localhost:9092"];
 
 const kafka = new Kafka({ brokers });
-
 const consumer = kafka.consumer({ groupId: "firstPart" });
-const topic = "raspi1";
-const secondTopic = "raspi2";
+
 let users = [];
+let total = 0;
+let newTotal = 0;
 let found = false;
 
 const distanceBetweenCoords = (centerX, centerY, x, y) => {
   return (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY);
 };
 
-const consume = async (aoi) => {
+const consume = async (aoi, topic) => {
+  total = newTotal;
   await consumer.connect();
   await consumer.subscribe({ topic });
-  await consumer.on("consumer.stop", async () => {
-    await playAllTracks();
-  });
   await consumer.run({
     eachMessage: async ({ message }) => {
+      newTotal++;
       found = false;
       console.log(`received message: ${message.value}`);
       let string = message.value.toString("utf-8");
@@ -55,14 +49,20 @@ const consume = async (aoi) => {
             user.centerY
           );
           if (distance < aoi.radius * aoi.radius) {
-            const muted = await mute(user.id % 10);
+            const muted = await play(user.id);
           } else {
-            const played = await play(user.id % 10);
+            const played = await mute(user.id);
           }
         });
       }
     },
   });
+  if (total == newTotal) {
+    await playAllTracks();
+  }
 };
 
-module.exports = consume;
+process.on("message", (message) => {
+  const result = consume(message.aoi, message.topic);
+  process.send(result);
+});

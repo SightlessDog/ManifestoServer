@@ -1,19 +1,27 @@
 const { Ableton } = require("ableton-js");
 
-const ableton = new Ableton();
 let tracks = [];
-
-ableton.on("connect", (e) => console.log("Connect", e));
-ableton.on("message", (m) => console.log("Message:", m));
+var ableton = new Ableton();
 
 const loadTracks = async () => {
-  tracks = await ableton.song.get("tracks");
+  try {
+    tracks = await ableton.song.get("tracks");
+    console.log("---- Tracks Loaded ----");
+    setTimeout(() => {
+      console.log("---- Starting the Script ----");
+    });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const play = async (id) => {
   let trackToPlay = tracks[id];
   try {
-    trackToPlay.set("mute", false);
+    const isTrackMuted = await trackToPlay.get("mute");
+    if (isTrackMuted) {
+      await trackToPlay.set("mute", false);
+    }
   } catch (err) {
     console.error(err);
   }
@@ -22,14 +30,31 @@ const play = async (id) => {
 const mute = async (id) => {
   let trackToMute = tracks[id];
   try {
-    trackToMute.set("mute", true);
+    const isTrackMuted = await trackToMute.get("mute");
+    if (!isTrackMuted) {
+      await trackToMute.set("mute", true);
+    }
   } catch (err) {
     console.error(err);
   }
+};
+
+const playAllTracks = async () => {
+  tracks.forEach(async (track) => {
+    try {
+      const isTrackMuted = await track.get("mute");
+      if (isTrackMuted) {
+        await track.set("mute", false);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  });
 };
 
 module.exports = {
   loadTracks: loadTracks,
   play: play,
   mute: mute,
+  playAllTracks: playAllTracks,
 };

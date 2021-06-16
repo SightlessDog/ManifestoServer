@@ -19,13 +19,12 @@ app.use(express.urlencoded({ extended: false }));
 
 let aoi = {};
 
-//start your server on port 3001
+//start your server on port 8080
 app.listen(8080, () => {
   console.log("Server Listening on port 8080");
 });
 
 app.get("/", function (req, res) {
-  console.log("Inside Home");
   res.writeHead(200, {
     "Content-Type": "application/json",
   });
