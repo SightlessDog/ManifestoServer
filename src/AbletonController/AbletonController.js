@@ -23,6 +23,7 @@ const play = async (id) => {
       await trackToPlay.set("mute", false);
     }
   } catch (err) {
+    console.error("Error playing track: ", id);
     console.error(err);
   }
 };
@@ -35,6 +36,7 @@ const mute = async (id) => {
       await trackToMute.set("mute", true);
     }
   } catch (err) {
+    console.error("Error muting track: ", id);
     console.error(err);
   }
 };
