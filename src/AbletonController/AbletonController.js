@@ -32,6 +32,9 @@ const mute = async (id) => {
   let trackToMute = tracks[id];
   try {
     const isTrackMuted = await trackToMute.get("mute");
+    const mixer = await track.get("mixer_device");
+    const volume = await mixer.get("volume");
+    console.log("Volume:", volume);
     if (!isTrackMuted) {
       await trackToMute.set("mute", true);
     }
@@ -45,6 +48,7 @@ const playAllTracks = async () => {
   tracks.forEach(async (track) => {
     try {
       const isTrackMuted = await track.get("mute");
+
       if (isTrackMuted) {
         await track.set("mute", false);
       }

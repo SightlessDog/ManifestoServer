@@ -4,7 +4,6 @@ const {
   mute,
   playAllTracks,
 } = require("../AbletonController/AbletonController");
-// const { fork } = require("child_process");
 
 const brokers = ["localhost:9092"];
 
@@ -34,6 +33,7 @@ const consume = async (aoi) => {
         console.log(`received message: ${message.value}`);
         let string = message.value.toString("utf-8");
         let obj = JSON.parse(string);
+        obj = { ...obj, entered: false };
         if (users.length === 0) {
           users.push(obj);
         } else {
@@ -50,14 +50,18 @@ const consume = async (aoi) => {
         }
         if (users.length !== 0) {
           users.forEach(async (user) => {
-            distance = distanceBetweenCoords(
+            let distance = distanceBetweenCoords(
               aoi.center.x,
               aoi.center.y,
               user.centerX,
               user.centerY
             );
-            if (distance < aoi.radius * aoi.radius) {
+            if (
+              distance < aoi.radius * aoi.radius ||
+              (user.entered && distance < (aoi.radius + 20) * (aoi.radius + 20))
+            ) {
               console.log("We mute track: ", user.id % 10);
+              user = { ...user, entered: true };
               await mute(user.id % 10);
             } else {
               console.log("We play track: ", user.id % 10);

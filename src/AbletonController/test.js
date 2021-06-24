@@ -3,8 +3,10 @@ const { Ableton } = require("ableton-js");
 const ableton = new Ableton();
 
 const test = async () => {
-  ableton.song.addListener("is_playing", (p) => console.log("Playing:", p));
-  ableton.song.addListener("tempo", (t) => console.log("Tempo:", t));
+  const tracks = await ableton.song.get("tracks");
+  const mixer = await tracks[0].get("mixer_device");
+  const volume = await mixer.get("volume");
+  console.log("Volume:", volume);
 };
 
 test();

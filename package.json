@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "test": "node src/KafkaConsumer/test.js"
   },
   "dependencies": {
     "ableton-js": "^2.1.1",
