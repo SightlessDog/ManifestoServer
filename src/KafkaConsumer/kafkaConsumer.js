@@ -12,7 +12,8 @@ const kafka = new Kafka({ brokers });
 const consumer = kafka.consumer({ groupId: "firstPart" });
 const topic = "raspi1";
 const secondTopic = "raspi2";
-let users = [];
+let firstCamUsers = [];
+let secondCamUsers;
 let found = false;
 
 const distanceBetweenCoords = (centerX, centerY, x, y) => {
@@ -20,6 +21,8 @@ const distanceBetweenCoords = (centerX, centerY, x, y) => {
 };
 
 const consume = async (aoi) => {
+  firstCircle = aoi.modifiedObject;
+  secondCircle = aoi.secmodifiedObject;
   await consumer.connect();
   await consumer.subscribe({ topic });
   await consumer.run({
@@ -35,21 +38,38 @@ const consume = async (aoi) => {
         let obj = JSON.parse(string);
         obj = { ...obj, entered: false };
         if (users.length === 0) {
-          users.push(obj);
+          if (obj.id / 10 === 1) {
+            firstCamUsers.push(obj);
+          } else {
+            secondCamUsers.push(obj);
+          }
         } else {
-          users.forEach((user) => {
-            if (obj.id === user.id) {
-              user.centerX = obj.centerX;
-              user.centerY = obj.centerY;
-              found = true;
+          if (obj.id / 10 === 1) {
+            firstCamUsers.forEach((user) => {
+              if (obj.id === user.id) {
+                user.centerX = obj.centerX;
+                user.centerY = obj.centerY;
+                found = true;
+              }
+            });
+            if (!found) {
+              firstCamUsers.push(obj);
             }
-          });
-          if (!found) {
-            users.push(obj);
+          } else {
+            secondCamUsers.forEach((user) => {
+              if (obj.id === user.id) {
+                user.centerX = obj.centerX;
+                user.centerY = obj.centerY;
+                found = true;
+              }
+            });
+            if (!found) {
+              secondCamUsers.push(obj);
+            }
           }
         }
         if (users.length !== 0) {
-          users.forEach(async (user) => {
+          firstCamUsers.forEach(async (user) => {
             let distance = distanceBetweenCoords(
               aoi.center.x,
               aoi.center.y,
@@ -57,8 +77,31 @@ const consume = async (aoi) => {
               user.centerY
             );
             if (
-              distance < aoi.radius * aoi.radius ||
-              (user.entered && distance < (aoi.radius + 20) * (aoi.radius + 20))
+              distance < firstCircle.radius * firstCircle.radius ||
+              (user.entered &&
+                distance <
+                  (firstCircle.radius + 20) * (firstCircle.radius + 20))
+            ) {
+              console.log("We mute track: ", user.id % 10);
+              user = { ...user, entered: true };
+              await mute(user.id % 10);
+            } else {
+              console.log("We play track: ", user.id % 10);
+              await play(user.id % 10);
+            }
+          });
+          secondCamUsers.forEach(async (user) => {
+            let distance = distanceBetweenCoords(
+              aoi.center.x,
+              aoi.center.y,
+              user.centerX,
+              user.centerY
+            );
+            if (
+              distance < secondCamUsers.radius * secondCamUsers.radius ||
+              (user.entered &&
+                distance <
+                  (secondCamUsers.radius + 20) * (secondCamUsers.radius + 20))
             ) {
               console.log("We mute track: ", user.id % 10);
               user = { ...user, entered: true };
