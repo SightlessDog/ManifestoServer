@@ -1,6 +1,6 @@
 const { Kafka } = require("kafkajs");
 
-const brokers = ["localhost:9092"];
+const brokers = ["192.168.0.104:9092"];
 const kafka = new Kafka({ brokers });
 const consumer = kafka.consumer({ groupId: "bla" });
 const topic = "myTopic";

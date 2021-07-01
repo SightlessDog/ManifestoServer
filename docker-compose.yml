@@ -17,6 +17,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.0.104:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
   kafkacat:
     image: confluentinc/cp-kafkacat
     command: sleep infinity

@@ -31,13 +31,13 @@ app.get("/", function (req, res) {
 });
 
 app.post("/", function (req, res) {
-  aoi = req.body.aoi;
+  const circles = req.body;
 
-  console.log(aoi);
+  console.log("[DEBUG] circles is", circles);
 
   loadTracks()
     .then(
-      consume(aoi).catch((err) => {
+      consume(circles).catch((err) => {
         console.error("error in consumer: ", err);
       })
     )
