@@ -7,9 +7,10 @@ const loadTracks = async () => {
   try {
     tracks = await ableton.song.get("tracks");
     console.log("---- Tracks Loaded ----");
+    console.log("TRACKS ARE ", tracks);
     setTimeout(() => {
       console.log("---- Starting the Script ----");
-    });
+    }, 2000);
   } catch (err) {
     console.log(err);
   }
@@ -45,7 +46,6 @@ const playAllTracks = async () => {
   tracks.forEach(async (track) => {
     try {
       const isTrackMuted = await track.get("mute");
-
       if (isTrackMuted) {
         await track.set("mute", false);
       }
